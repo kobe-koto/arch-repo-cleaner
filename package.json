@@ -4,11 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "bundle": "esbuild index.ts --bundle --platform=node --outfile=dist/main.js"
+    "bundle": "bun build index.ts --bundle --target=node --outdir=dist/"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "esbuild": "^0.27.0"
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
