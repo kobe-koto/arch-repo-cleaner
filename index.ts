@@ -2,13 +2,15 @@ import fs from "node:fs";
 import path from "node:path";
 import { REPO_ROOT, MAX_KEEP } from "./config.ts"
 import type { PackageInfo, Packages } from "./types.ts";
-import chalk from "chalk";
+import pc from "picocolors";
 
 // obtain args 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
 if (dryRun) {
-    console.log(chalk.bold(chalk.yellow("==>"), "Dry running..."))
+    console.log(pc.bold(
+        `${pc.yellow("==>")} Dry running...`
+    ))
 }
 
 // read all arch's folders
@@ -17,7 +19,9 @@ const RepoArchFolders = fs.readdirSync(REPO_ROOT, { withFileTypes: true })
 
 // read all folders contents
 for (const arch of RepoArchFolders) {
-    console.log(chalk.bold(chalk.green("==>"), `Processing arch ${chalk.blue(arch)}...`))
+    console.log(pc.bold(
+        `${pc.green("==>")} Processing arch ${pc.blue(arch)}...`
+    ))
     const PackageFiles = fs.readdirSync(path.join(REPO_ROOT, arch), { withFileTypes: true })
     .filter(item => item.name.includes(".pkg"))  // ignore all non pkg files
     .map(i=>i.name)
@@ -38,14 +42,16 @@ for (const arch of RepoArchFolders) {
         Packages[pkgname].push(PackageInfo)
     }
     for (const pkgname in Packages) {
-        console.log(chalk.bold(chalk.blue("  ->"), `Proceeding with ${chalk.blue(pkgname)}...`))
+        console.log(pc.bold(
+            `${pc.blue("  ->")} Proceeding with ${pc.blue(pkgname)}...`
+        ))
         // sort pkgs from new to old
         Packages[pkgname]!.sort((a, b) => b.modifiedTime - a.modifiedTime);
         // slice off the max keep pkgs
         Packages[pkgname] = Packages[pkgname]!.slice(MAX_KEEP);
         // delete
         if (Packages[pkgname]!.length === 0) {
-            console.log(chalk.gray("     No old pkgs to delete, skipping..."));
+            console.log(pc.gray("     No old pkgs to delete, skipping..."));
             continue;
         } else { // generate the list of old pkgs to delete
             const list = [];
@@ -59,11 +65,9 @@ for (const arch of RepoArchFolders) {
                     console.log(`     Deleting ${filepath}...`);
                     fs.unlinkSync(filepath);
                 } else {
-                    console.log(chalk.gray(`     Skipping delete ${filepath}...`));
+                    console.log(pc.gray(`     Skipping delete ${filepath}...`));
                 }
             }
         }
     }
-
-    
 }
